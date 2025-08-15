@@ -1,2 +1,10 @@
 # CodeAlpha_Music-Player
-A simple JavaScript music player with play/pause, next/previous, volume control, progress bar seek, and song info display. Built with HTML, CSS, and Javascript. It is easily customizable with your own MP3 files.
+A simple music player built using HTML, CSS, and JavaScript.  
+
+# Features
+- Play / Pause music
+- Next / Previous song navigation
+- Displays song title & artist
+- Progress bar with seek functionality
+- Volume control slider
+- Autoplay next track when current one ends
