@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript Music Player</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #181818;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .player {
+        background: #222;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        width: 300px;
+    }
+    .song-info {
+        margin-bottom: 15px;
+    }
+    .controls {
+        margin-top: 10px;
+    }
+    button {
+        background: #444;
+        border: none;
+        color: #fff;
+        padding: 10px;
+        margin: 5px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+        background: #666;
+    }
+    .progress-container {
+        background: #444;
+        height: 5px;
+        cursor: pointer;
+        margin: 10px 0;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .progress {
+        background: #ff3d00;
+        height: 5px;
+        width: 0%;
+    }
+    .volume-container {
+        margin-top: 10px;
+    }
+    input[type="range"] {
+        width: 100%;
+    }
+</style>
+</head>
+<body>
+
+<div class="player">
+    <div class="song-info">
+        <h3 id="title">Song Title</h3>
+        <p id="artist">Artist</p>
+    </div>
+
+    <audio id="audio"></audio>
+
+    <div class="progress-container" id="progress-container">
+        <div class="progress" id="progress"></div>
+    </div>
+
+    <div>
+        <span id="current-time">0:00</span> / <span id="duration">0:00</span>
+    </div>
+
+    <div class="controls">
+        <button id="prev">&#9664;</button>
+        <button id="play">&#9654;</button>
+        <button id="next">&#9654;&#9654;</button>
+    </div>
+
+    <div class="volume-container">
+        <label>Volume:</label>
+        <input type="range" id="volume" min="0" max="1" step="0.01">
+    </div>
+</div>
+
+<script>
+const songs = [
+    { title: "Song One", artist: "Artist One", src: "music/song1.mp3" },
+    { title: "Song Two", artist: "Artist Two", src: "music/song2.mp3" },
+    { title: "Song Three", artist: "Artist Three", src: "music/song3.mp3" }
+];
+
+let songIndex = 0;
+const audio = document.getElementById('audio');
+const title = document.getElementById('title');
+const artist = document.getElementById('artist');
+const playBtn = document.getElementById('play');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const progress = document.getElementById('progress');
+const progressContainer = document.getElementById('progress-container');
+const currentTimeEl = document.getElementById('current-time');
+const durationEl = document.getElementById('duration');
+const volumeControl = document.getElementById('volume');
+
+function loadSong(song) {
+    title.textContent = song.title;
+    artist.textContent = song.artist;
+    audio.src = song.src;
+}
+
+function playSong() {
+    audio.play();
+    playBtn.innerHTML = '&#10074;&#10074;'; // pause icon
+}
+
+function pauseSong() {
+    audio.pause();
+    playBtn.innerHTML = '&#9654;'; // play icon
+}
+
+playBtn.addEventListener('click', () => {
+    if (audio.paused) {
+        playSong();
+    } else {
+        pauseSong();
+    }
+});
+
+nextBtn.addEventListener('click', nextSong);
+prevBtn.addEventListener('click', prevSong);
+
+function nextSong() {
+    songIndex = (songIndex + 1) % songs.length;
+    loadSong(songs[songIndex]);
+    playSong();
+}
+
+function prevSong() {
+    songIndex = (songIndex - 1 + songs.length) % songs.length;
+    loadSong(songs[songIndex]);
+    playSong();
+}
+
+audio.addEventListener('timeupdate', updateProgress);
+
+function updateProgress(e) {
+    const { duration, currentTime } = e.srcElement;
+    const progressPercent = (currentTime / duration) * 100;
+    progress.style.width = progressPercent + '%';
+
+    let mins = Math.floor(currentTime / 60);
+    let secs = Math.floor(currentTime % 60);
+    if (secs < 10) secs = '0' + secs;
+    currentTimeEl.textContent = `${mins}:${secs}`;
+
+    if (duration) {
+        let dMins = Math.floor(duration / 60);
+        let dSecs = Math.floor(duration % 60);
+        if (dSecs < 10) dSecs = '0' + dSecs;
+        durationEl.textContent = `${dMins}:${dSecs}`;
+    }
+}
+
+progressContainer.addEventListener('click', setProgress);
+
+function setProgress(e) {
+    const width = this.clientWidth;
+    const clickX = e.offsetX;
+    const duration = audio.duration;
+    audio.currentTime = (clickX / width) * duration;
+}
+
+volumeControl.addEventListener('input', (e) => {
+    audio.volume = e.target.value;
+});
+
+audio.addEventListener('ended', nextSong); // autoplay next
+
+// Init
+loadSong(songs[songIndex]);
+</script>
+
+</body>
+</html>
